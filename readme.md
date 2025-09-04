@@ -1,33 +1,31 @@
-## Goal
-*    Backtest portfolio strategies.
+# Neural Capital — Crash Analysis POC
 
-*    Study asset correlations and diversification.
+## Purpose
+Reproduce how a Balanced portfolio (60% equities, 30% bonds, 10% cash) performed versus the S&P 500 across major market breakdowns. Produce slide-ready charts and a metrics table for each event.
 
-*    Analyze market shocks (e.g., dotcom crash, GFC, COVID-19).
+## What’s included
+- `Neural_Capital_Crash_Analysis.ipynb` — Jupyter notebook (main analysis).
+- `outputs/per_event_metrics.xlsx` — Excel table with metrics per event and portfolio.
+- `outputs/figs/` — PNGs: `{Event}_balanced_vs_spy.png`, `{Event}_drawdown.png`.
+- `outputs/*.csv` — timeseries used in the analysis.
 
-*    Explore risk-adjusted performance (Sharpe ratio, drawdowns, etc.).
+## How to run (quick)
+1. Create and activate Python virtual env.
+2. `pip install -r requirements.txt` (or install the listed packages).
+3. `jupyter lab` → open `Neural_Capital_Crash_Analysis.ipynb` → Run All.
+4. Find charts and metrics in `outputs/`.
 
-## What the code does
+## Key assumptions
+- Using **price-only** Close prices (no dividends) for the POC.
+- Monthly rebalancing.
+- Portfolio mapping: equities = SPY/QQQ/VXUS; bonds = BND/IEF/TIP; cash = SHY; gold = GLD.
+- Transaction costs are ignored.
 
-<p>Define universe of assets </p>
+## Notes / Limitations
+- Some ETFs don’t have data for older events (e.g., Dot-com era). Notebook will skip events that cannot be simulated with the full portfolio.
+- Dividend/total-return adjustment and transaction costs are not included and can change numerical results.
 
-* A dictionary maps “friendly” names (e.g., SPY, BTC) to their Yahoo Finance symbols.
-
-* This makes it easy to work with both traditional and crypto assets in one dataset.
-
-<p>Download historical prices </p>
-
-* Using yfinance, the script retrieves adjusted daily close prices for all tickers in one request.
-
-* Dates are set from 1995 to today, ensuring coverage across major financial crises.
-
-<p>Clean and organize data</p>
-
-* Converts Yahoo’s symbols back to the friendly names for readability.
-
-* Ensures a consistent time index, fills forward missing data, and drops rows with all missing values.
-
-<p>Compute daily returns</p>
-
-* Prices are transformed into percentage daily returns, which are the standard input for most portfolio and risk analyses.
-
+## Next steps
+- Add total-return (Adj Close) version.
+- Add a simple rule-based “AI-proxy” to demonstrate dynamic protection (e.g., shift out of equities on macro signals).
+- Optionally backfill proxies for very old events to cover Dot-com fully.
