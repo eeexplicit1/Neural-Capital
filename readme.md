@@ -1,58 +1,31 @@
-# Multi-Asset Portfolio Event Study  
+# Neural Capital — Crash Analysis POC
 
-## Goal
-This framework provides a **reusable event-study pipeline** for portfolio analysis. With it, a data scientist can:  
-- Backtest allocation strategies under stress scenarios.  
-- Compare diversified portfolios vs. benchmarks during crises.  
-- Quantify risk via drawdowns and recovery times.  
-- Generate reproducible reports (tables + charts) for communication.  
+## Purpose
+Reproduce how a Balanced portfolio (60% equities, 30% bonds, 10% cash) performed versus the S&P 500 across major market breakdowns. Produce slide-ready charts and a metrics table for each event.
 
-The end result is a **historical stress test** of a balanced portfolio, answering the question:  
+## What’s included
+- `Neural_Capital_Crash_Analysis.ipynb` — Jupyter notebook (main analysis).
+- `outputs/per_event_metrics.xlsx` — Excel table with metrics per event and portfolio.
+- `outputs/figs/` — PNGs: `{Event}_balanced_vs_spy.png`, `{Event}_drawdown.png`.
+- `outputs/*.csv` — timeseries used in the analysis.
 
-> *“How resilient is this portfolio compared to the S&P 500 during major financial shocks?”*  
+## How to run (quick)
+1. Create and activate Python virtual env.
+2. `pip install -r requirements.txt` (or install the listed packages).
+3. `jupyter lab` → open `Neural_Capital_Crash_Analysis.ipynb` → Run All.
+4. Find charts and metrics in `outputs/`.
 
-## Overview  
-This project downloads historical financial data for a diversified set of assets (stocks, bonds, gold, crypto) and evaluates portfolio performance during major market events. It automates data collection, return calculation, event slicing, metric computation, and visualization.  
+## Key assumptions
+- Using **price-only** Close prices (no dividends) for the POC.
+- Monthly rebalancing.
+- Portfolio mapping: equities = SPY/QQQ/VXUS; bonds = BND/IEF/TIP; cash = SHY; gold = GLD.
+- Transaction costs are ignored.
 
-## Workflow  
+## Notes / Limitations
+- Some ETFs don’t have data for older events (e.g., Dot-com era). Notebook will skip events that cannot be simulated with the full portfolio.
+- Dividend/total-return adjustment and transaction costs are not included and can change numerical results.
 
-### 1. Data Setup  
-- **Assets**: A dictionary (`TICKERS`) maps user-friendly names (e.g., `SPY`, `BTC`) to their Yahoo Finance tickers.  
-- **Period**: Data is pulled from **1995-01-01** up to today.  
-- **Source**: Prices are downloaded from Yahoo Finance using the [`yfinance`](https://pypi.org/project/yfinance/) package.  
-
-### 2. Data Preparation  
-- **Price Cleaning**: Missing values are forward-filled, indices are normalized to trading days, and symbols are renamed for readability.  
-- **Return Series**: Daily percentage returns are computed with `pct_change()`.  
-- **Portfolio Construction**: Assets are combined into a balanced 60/30/10 allocation (equity/bond/cash) for benchmarking against the S&P 500 (`SPY`).  
-
-### 3. Event Windows  
-Key crisis periods are defined, for example:  
-- **Dotcom Bubble** (2000–2002)  
-- **Global Financial Crisis** (2007–2009)  
-- **COVID Crash** (2020)  
-- **2022 Rate Hikes**  
-- Optional: **Asian Crisis** (1997), **Debt Ceiling** (2011)  
-
-Each event window is used to slice portfolio and benchmark data.  
-
-### 4. Event Analysis  
-For each event window:  
-1. **Slicing**: Extract portfolio and SPY data only within event dates.  
-2. **Normalization**: Start both series at **100** to compare relative performance.  
-3. **Metrics Computed**:  
-   - CAGR (annualized growth)  
-   - Volatility  
-   - Maximum Drawdown  
-   - Crash Return (from peak to trough)  
-   - Recovery Days (time to regain peak)  
-   - Event start/end/trough dates  
-4. **Visualization**:  
-   - **Performance Chart** — portfolio vs. SPY indexed to 100.  
-   - **Drawdown Chart** — depth and timing of drawdowns.  
-
-### 5. Output  
-- **Charts**: Saved under `outputs/figs/` as PNG files (one performance chart and one drawdown chart per event).  
-- **Metrics Table**: Exported to both CSV and Excel (`outputs/per_event_metrics.csv` and `.xlsx`).  
-- **Preview**: Prints the first rows of the metrics DataFrame for quick inspection.  
-
+## Next steps
+- Add total-return (Adj Close) version.
+- Add a simple rule-based “AI-proxy” to demonstrate dynamic protection (e.g., shift out of equities on macro signals).
+- Optionally backfill proxies for very old events to cover Dot-com fully.
